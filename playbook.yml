@@ -64,3 +64,32 @@
         file: path=/home/vagrant/Stash/Sush-E state=directory
       - name: Set permissions on the home directory
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+
+- name: Update Hosts File
+  hosts: Ubuntu
+  sudo: True
+  tasks:
+      - name: Add logfaces to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.123 logfaces"
+      - name: Add logfaces-boston to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.100.124 logfaces-boston"
+      - name: Add mongo1test to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.57 mongo1test"
+      - name: Add mongo2test to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.63 mongo2test"
+      - name: Add mongo3test to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.59 mongo3test"
+      - name: Add stagetwo to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.255.29 stagetwo"
+      - name: Add cd0 to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.85 cd0"
+      - name: Add cd1 to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.81 cd1"
+      - name: Add cd5 to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.114 cd5"
+      - name: Add cd6 to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.59 cd6"
+      - name: Add rabbit-test to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.28 rabbit-test"
+      - name: Add docker1test to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.58 docker1test"
