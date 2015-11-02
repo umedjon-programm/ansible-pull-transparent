@@ -95,3 +95,5 @@
         lineinfile: dest=/etc/hosts line="192.168.254.28 rabbit-test"
       - name: Add docker1test to hostfile
         lineinfile: dest=/etc/hosts line="192.168.254.58 docker1test"
+      - name: Add docker1test to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.255.18 al-autotest-integration"
