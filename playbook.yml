@@ -71,10 +71,14 @@
   hosts: Ubuntu
   sudo: True
   tasks:
+      - name: Add lds to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.100.134 lds"
       - name: Add logfaces to hostfile
         lineinfile: dest=/etc/hosts line="192.168.254.123 logfaces"
       - name: Add logfaces-boston to hostfile
         lineinfile: dest=/etc/hosts line="192.168.100.124 logfaces-boston"
+      - name: Add mli_forever to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.66 mli_forever"
       - name: Add mongo1test to hostfile
         lineinfile: dest=/etc/hosts line="192.168.254.57 mongo1test"
       - name: Add mongo2test to hostfile
