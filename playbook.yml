@@ -65,7 +65,7 @@
       - name: Create Operations project directory
         file: path=/home/vagrant/Stash/Operations state=directory
       - name: Create Asgard Lite project directory
-        file: path=/home/vagrant/Stash/AL state=directory
+        file: path=/home/vagrant/Stash/Asgard-Light state=directory
       - name: Set permissions on the home directory
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
