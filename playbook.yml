@@ -85,6 +85,10 @@
         lineinfile: dest=/etc/hosts line="192.168.254.63 mongo2test"
       - name: Add mongo3test to hostfile
         lineinfile: dest=/etc/hosts line="192.168.254.59 mongo3test" state=absent
+      - name: Add mongo1 to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.100.127 mongo1"
+      - name: Add mongo2 to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.100.183 mongo2"
       - name: Add stagetwo to hostfile
         lineinfile: dest=/etc/hosts line="192.168.255.29 stagetwo"
       - name: Add cd0 to hostfile
