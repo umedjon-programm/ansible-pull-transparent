@@ -108,4 +108,4 @@
       - name: Add AL integration box to hostfile
         lineinfile: dest=/etc/hosts line="192.168.255.18 al-autotest-integration"
       - name: Add AL edge box to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.255.16 al-edge"
+        lineinfile: dest=/etc/hosts line="192.168.255.16 al-autotest-edge"
