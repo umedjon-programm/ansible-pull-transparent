@@ -55,17 +55,17 @@
   sudo: False
   tasks:
       - name: Create Asgard project directory
-        file: path=/home/vagrant/Stash/Asgard state=directory
+        file: path=/home/vagrant/Bitbucket/Asgard state=directory
       - name: Create Gradle project directory
-        file: path=/home/vagrant/Stash/Gradle state=directory
+        file: path=/home/vagrant/Bitbucket/Gradle state=directory
       - name: Create Mold-E project directory
-        file: path=/home/vagrant/Stash/Mold-E state=directory
+        file: path=/home/vagrant/Bitbucket/Mold-E state=directory
       - name: Create Sush-E project directory
-        file: path=/home/vagrant/Stash/Sush-E state=directory
+        file: path=/home/vagrant/Bitbucket/Sush-E state=directory
       - name: Create Operations project directory
-        file: path=/home/vagrant/Stash/Operations state=directory
+        file: path=/home/vagrant/Bitbucket/Operations state=directory
       - name: Create Asgard Lite project directory
-        file: path=/home/vagrant/Stash/Asgard-Light state=directory
+        file: path=/home/vagrant/Bitbucket/Asgard-Light state=directory
       - name: Set permissions on the home directory
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
