@@ -80,7 +80,7 @@
       - name: Add logfaces-boston to hostfile
         lineinfile: dest=/etc/hosts line="192.168.100.124 logfaces-boston"
       - name: Add mli-forever to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.66 mli-forever"
+        lineinfile: dest=/etc/hosts line="192.168.254.73 mli-forever"
       - name: Add mongo1test to hostfile
         lineinfile: dest=/etc/hosts line="192.168.254.57 mongo1test"
       - name: Add mongo2test to hostfile
