@@ -33,10 +33,10 @@
                 url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
                 dest=/usr/local/share/ca-certificates/docker-registry/registry.transparent.CA.crt
         register: certificate
-      - name: Add registry to hosts file
-        lineinfile: dest=/etc/hosts line="192.168.254.90 registry.transparent.com"
-      - name: Add cd1 to hosts file
-        lineinfile: dest=/etc/hosts line="192.168.254.81 cd1"
+#     - name: Add registry to hosts file
+#       lineinfile: dest=/etc/hosts line="192.168.254.90 registry.transparent.com"
+#     - name: Add cd1 to hosts file
+#       lineinfile: dest=/etc/hosts line="192.168.254.81 cd1"
       - name: Update certificates
         shell: update-ca-certificates
         when: certificate|changed
