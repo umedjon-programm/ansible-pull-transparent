@@ -9,7 +9,7 @@
 
 - name: Install Git Projects
   hosts: Ubuntu
-  sudo: False
+  become: False
   tasks:
     - name: Make bin Directory
       file: path=/home/vagrant/bin state=directory mode=0755
@@ -22,7 +22,7 @@
 
 - name: Docker Registry (must be on VPN)
   hosts: Ubuntu
-  sudo: True
+  become: True
   tasks:
       - name: Create CA certificates directory
         file: path=/usr/local/share/ca-certificates/docker-registry state=directory
@@ -52,7 +52,7 @@
 
 - name: Create Source Folders 
   hosts: Ubuntu
-  sudo: False
+  become: False
   tasks:
       - name: Create Asgard project directory
         file: path=/home/vagrant/Bitbucket/Asgard state=directory
@@ -71,7 +71,7 @@
 
 - name: Update Hosts File
   hosts: Ubuntu
-  sudo: True
+  become: True
   tasks:
       - name: Add lds to hostfile
         lineinfile: dest=/etc/hosts line="192.168.100.134 lds"
