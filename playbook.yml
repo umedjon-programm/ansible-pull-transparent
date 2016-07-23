@@ -4,21 +4,16 @@
   hosts: all
   gather_facts: True
   tasks:
-    - name: create groups based on distribution
-      group_by: key={{ ansible_distribution }}
+    - group_by: key={{ ansible_distribution }}
 
 - name: Install Git Projects
   hosts: Ubuntu
   become: False
   tasks:
-    - name: Make bin Directory
-      file: path=/home/vagrant/bin state=directory mode=0755
-    - name: Install Git
-      apt: name=git state=present
-    - name: Pull Down Docker Containers
-      git: repo=https://github.com/kurron/docker-compose-tl.git dest=/home/vagrant/bin/servers
-    - name: Set permissions on the home directory
-      file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+    - file: path=/home/vagrant/bin state=directory mode=0755
+    - apt: name=git state=present
+    - git: repo=https://github.com/kurron/docker-compose-tl.git dest=/home/vagrant/bin/servers
+    - file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Docker Registry (must be on VPN)
   hosts: Ubuntu
@@ -54,58 +49,33 @@
   hosts: Ubuntu
   become: False
   tasks:
-      - name: Create Asgard project directory
-        file: path=/home/vagrant/Bitbucket/Asgard state=directory
-      - name: Create Gradle project directory
-        file: path=/home/vagrant/Bitbucket/Gradle state=directory
-      - name: Create Mold-E project directory
-        file: path=/home/vagrant/Bitbucket/Mold-E state=directory
-      - name: Create Sush-E project directory
-        file: path=/home/vagrant/Bitbucket/Sush-E state=directory
-      - name: Create Operations project directory
-        file: path=/home/vagrant/Bitbucket/Operations state=directory
-      - name: Create Asgard Lite project directory
-        file: path=/home/vagrant/Bitbucket/Asgard-Light state=directory
-      - name: Set permissions on the home directory
-        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+      - file: path=/home/vagrant/Bitbucket/Asgard state=directory
+      - file: path=/home/vagrant/Bitbucket/Gradle state=directory
+      - file: path=/home/vagrant/Bitbucket/Mold-E state=directory
+      - file: path=/home/vagrant/Bitbucket/Sush-E state=directory
+      - file: path=/home/vagrant/Bitbucket/Operations state=directory
+      - file: path=/home/vagrant/Bitbucket/Asgard-Light state=directory
+      - file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Update Hosts File
   hosts: Ubuntu
   become: True
   tasks:
-      - name: Add lds to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.100.134 lds"
-      - name: Add logfaces to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.123 logfaces"
-      - name: Add logfaces-boston to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.100.124 logfaces-boston"
-      - name: Add mli-forever to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.73 mli-forever"
-      - name: Add mongo1test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.57 mongo1test"
-      - name: Add mongo2test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.63 mongo2test"
-      - name: Add mongo3test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.59 mongo3test" state=absent
-      - name: Add mongo1 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.100.127 mongo1"
-      - name: Add mongo2 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.100.183 mongo2"
-      - name: Add stagetwo to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.255.29 stagetwo"
-      - name: Add cd0 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.85 cd0"
-      - name: Add cd1 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.81 cd1"
-      - name: Add cd5 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.114 cd5"
-      - name: Add cd6 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.59 cd6"
-      - name: Add rabbit-test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.28 rabbit-test"
-      - name: Add docker1test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.58 docker1test"
-      - name: Add AL integration box to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.255.18 al-autotest-integration"
-      - name: Add AL edge box to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.255.16 al-autotest-edge"
+      - lineinfile: dest=/etc/hosts line="192.168.100.134 lds"
+      - lineinfile: dest=/etc/hosts line="192.168.254.123 logfaces"
+      - lineinfile: dest=/etc/hosts line="192.168.100.124 logfaces-boston"
+      - lineinfile: dest=/etc/hosts line="192.168.254.73 mli-forever"
+      - lineinfile: dest=/etc/hosts line="192.168.254.57 mongo1test"
+      - lineinfile: dest=/etc/hosts line="192.168.254.63 mongo2test"
+      - lineinfile: dest=/etc/hosts line="192.168.254.59 mongo3test" state=absent
+      - lineinfile: dest=/etc/hosts line="192.168.100.127 mongo1"
+      - lineinfile: dest=/etc/hosts line="192.168.100.183 mongo2"
+      - lineinfile: dest=/etc/hosts line="192.168.255.29 stagetwo"
+      - lineinfile: dest=/etc/hosts line="192.168.254.85 cd0"
+      - lineinfile: dest=/etc/hosts line="192.168.254.81 cd1"
+      - lineinfile: dest=/etc/hosts line="192.168.254.114 cd5"
+      - lineinfile: dest=/etc/hosts line="192.168.254.59 cd6"
+      - lineinfile: dest=/etc/hosts line="192.168.254.28 rabbit-test"
+      - lineinfile: dest=/etc/hosts line="192.168.254.58 docker1test"
+      - lineinfile: dest=/etc/hosts line="192.168.255.18 al-autotest-integration"
+      - lineinfile: dest=/etc/hosts line="192.168.255.16 al-autotest-edge"
