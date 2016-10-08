@@ -50,6 +50,14 @@
       - name: Set permissions on the home directory
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
+- name: Install FFMpeg
+  hosts: all
+  become: True
+  tasks:
+      - get_url: url= http://192.168.254.81:81/artifactory/static/ffmpeg/ffmpeg-2.6.1-64bit-static.tar.xz dest=/root/ffmpeg.tar.xz
+      - unarchive: src=/root/ffmpeg.tar.xz dest=/opt copy=no owner=root group=root mode=555 creates=/opt/ffmpeg-2.6.1-64bit-static/ffprobe
+      - file: src=/opt/ffmpeg-2.6.1-64bit-static path=/opt/ffmpeg state=link
+
 - name: Create Source Folders 
   hosts: all
   become: False
