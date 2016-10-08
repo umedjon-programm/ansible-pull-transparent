@@ -6,17 +6,22 @@
   tasks:
     - group_by: key={{ ansible_distribution }}
 
-- name: Install Git Projects
+- name: Install Pakcages (Ubuntu)
   hosts: Ubuntu
   become: False
   tasks:
-    - file: path=/home/vagrant/bin state=directory mode=0755
     - apt: name=git state=present
+
+- name: Install Git Projects
+  hosts: all
+  become: False
+  tasks:
+    - file: path=/home/vagrant/bin state=directory mode=0755
     - git: repo=https://github.com/kurron/docker-compose-tl.git dest=/home/vagrant/bin/servers
     - file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Docker Registry (must be on VPN)
-  hosts: Ubuntu
+  hosts: all
   become: True
   tasks:
       - name: Create CA certificates directory
@@ -46,7 +51,7 @@
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Create Source Folders 
-  hosts: Ubuntu
+  hosts: all
   become: False
   tasks:
       - file: path=/home/vagrant/Bitbucket/Asgard state=directory
@@ -58,7 +63,7 @@
       - file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Update Hosts File
-  hosts: Ubuntu
+  hosts: all
   become: True
   tasks:
       - lineinfile: dest=/etc/hosts line="192.168.100.134 lds"
