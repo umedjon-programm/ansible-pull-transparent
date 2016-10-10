@@ -21,7 +21,7 @@
     - file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Docker Registry (must be on VPN)
-  hosts: all
+  hosts: Ubuntu
   become: True
   tasks:
       - name: Create CA certificates directory
@@ -33,12 +33,29 @@
                 url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
                 dest=/usr/local/share/ca-certificates/docker-registry/registry.transparent.CA.crt
         register: certificate
-#     - name: Add registry to hosts file
-#       lineinfile: dest=/etc/hosts line="192.168.254.90 registry.transparent.com"
-#     - name: Add cd1 to hosts file
-#       lineinfile: dest=/etc/hosts line="192.168.254.81 cd1"
       - name: Update certificates
         shell: update-ca-certificates
+        when: certificate|changed
+      - name: Place configuration file into the root account
+        get_url: url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/.dockercfg dest=/root/.dockercfg
+      - name: Place configuration file into the vagrant account
+        get_url: url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/.dockercfg dest=/home/vagrant/.dockercfg
+      - name: Restart Docker
+        command: service docker restart
+        when: certificate|changed
+      - name: Set permissions on the home directory
+        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+
+- name: Docker Registry (must be on VPN)
+  hosts: CentOS
+  become: True
+  tasks:
+        get_url: >
+                url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
+                dest=/etc/pki/ca-trust/source/anchors/registry.transparent.CA.crt
+        register: certificate
+      - name: Update certificates
+        shell: /bin/update-ca-trust
         when: certificate|changed
       - name: Place configuration file into the root account
         get_url: url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/.dockercfg dest=/root/.dockercfg
