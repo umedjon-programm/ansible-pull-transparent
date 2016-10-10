@@ -50,6 +50,7 @@
   hosts: CentOS
   become: True
   tasks:
+      - name: Create SSL certificates directory
         get_url: >
                 url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
                 dest=/etc/pki/ca-trust/source/anchors/registry.transparent.CA.crt
