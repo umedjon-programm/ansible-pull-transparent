@@ -18,7 +18,7 @@
   tasks:
     - file: path=/home/vagrant/bin state=directory mode=0755
     - git: repo=https://github.com/kurron/docker-compose-tl.git dest=/home/vagrant/bin/servers
-    - file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+#   - file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
 - name: Docker Registry (must be on VPN)
   hosts: Ubuntu
