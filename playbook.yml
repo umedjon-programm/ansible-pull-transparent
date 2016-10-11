@@ -121,4 +121,4 @@
       - file: src=/usr/bin/ansible-galaxy dest=/usr/local/bin/ansible-galaxy state=link
       - file: src=/usr/bin/ansible-playbook dest=/usr/local/bin/ansible-playbook state=link
       - file: src=/usr/bin/ansible-pull dest=/usr/local/bin/ansible-pull state=link
-      - file: src=/usr/bin/ansible-vault dest=/usr/bin/ansible-vault state=link
+      - file: src=/usr/bin/ansible-vault dest=/usr/local/bin/ansible-vault state=link
