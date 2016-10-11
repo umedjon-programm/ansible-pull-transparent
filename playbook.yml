@@ -110,3 +110,15 @@
       - lineinfile: dest=/etc/hosts line="192.168.254.58 docker1test"
       - lineinfile: dest=/etc/hosts line="192.168.255.18 al-autotest-integration"
       - lineinfile: dest=/etc/hosts line="192.168.255.16 al-autotest-edge"
+
+- name: Soft-link Ansible Files
+  hosts: CentOS
+  become: True
+  tasks:
+      - file: src=/usr/bin/ansible dest=/usr/local/bin/ansible state=link
+      - file: src=/usr/bin/ansible-console dest=/usr/local/bin/ansible-console state=link
+      - file: src=/usr/bin/ansible-doc dest=/usr/local/bin/ansible-doc state=link
+      - file: src=/usr/bin/ansible-galaxy dest=/usr/local/bin/ansible-galaxy state=link
+      - file: src=/usr/bin/ansible-playbook dest=/usr/local/bin/ansible-playbook state=link
+      - file: src=/usr/bin/ansible-playbook dest=/usr/local/bin/ansible-playbook state=link
+      - file: src=/usr/bin/ansible-vault dest=/usr/bin/ansible-vault state=link
