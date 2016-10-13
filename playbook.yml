@@ -6,11 +6,17 @@
   tasks:
     - group_by: key={{ ansible_distribution }}
 
-- name: Install Pakcages (Ubuntu)
+- name: Install Packages (Ubuntu)
   hosts: Ubuntu
-  become: False
+  become: True
   tasks:
     - apt: name=git state=present
+
+- name: Install Packages (CentOS)
+  hosts: CentOS
+  become: True
+  tasks:
+    - yum: name=iptables-services state=latest
 
 - name: Install Git Projects
   hosts: all
