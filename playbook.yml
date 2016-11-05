@@ -55,8 +55,11 @@
   become: False
   tasks:
       - file:
-            path: "{{ansible_user_dir}}/Bitbucket/{{item}}"
+            path: "/home/vagrant/Bitbucket/{{item}}"
             state: directory
+            mode: 0755
+            owner: vagrant
+            group: vagrant
         with_items:
             - Asgard
             - Gradle
@@ -73,12 +76,14 @@
           path: "{{ansible_user_dir}}/bin"
           state: directory
           mode: 0755
+          owner: vagrant
+          group: vagrant
     - git:
           repo: https://github.com/kurron/docker-compose-tl.git
-          dest: "{{ansible_user_dir}}/bin/servers"
+          dest: "/home/vagrant/bin/servers"
     - git:
           repo: https://github.com/kurron/docker-compose-tl.git
-          dest: "{{ansible_user_dir}}/GitHub/docker-compose-tl"
+          dest: "/home/vagrant/GitHub/docker-compose-tl"
 
 - name: Docker Firewall Rules
   hosts: CentOS,Fedora
@@ -106,14 +111,14 @@
             creates: /opt/ffmpeg-2.6.1-64bit-static/ffprobe
       - file: src=/opt/ffmpeg-2.6.1-64bit-static path=/opt/ffmpeg state=link
 
-- name: Docker Registry Credentials (unprivileged)
+- name: Docker Registry Credentials (unprivileged
   hosts: all
   become: False
   tasks:
       - name: Place configuration file into the standard account
         get_url:
           url: http://cd1:81/artifactory/static/ease/docker-registry/.dockercfg
-          dest: "{{ansible_user_dir}}/.dockercfg"
+          dest: "/home/vagrant/.dockercfg"
 
 - name: Docker Registry Credentials (privileged)
   hosts: all
