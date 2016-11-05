@@ -75,9 +75,6 @@
     - file:
           path: "{{ansible_user_dir}}/bin"
           state: directory
-          mode: 0755
-          owner: vagrant
-          group: vagrant
     - git:
           repo: https://github.com/kurron/docker-compose-tl.git
           dest: "/home/vagrant/bin/servers"
