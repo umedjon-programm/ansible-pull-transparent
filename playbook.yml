@@ -57,7 +57,6 @@
       - file:
             path: "/home/vagrant/Bitbucket/{{item}}"
             state: directory
-            mode: 0755
             owner: vagrant
             group: vagrant
         with_items:
@@ -99,12 +98,10 @@
       - get_url:
             url: http://cd1:81/artifactory/static/ffmpeg/ffmpeg-2.6.1-64bit-static.tar.xz
             dest: "{{ansible_user_dir}}/ffmpeg.tar.xz"
-            mode: 555
       - unarchive:
             src: "{{ansible_user_dir}}/ffmpeg.tar.xz"
             dest: /opt
             copy: no
-            mode: 555
             creates: /opt/ffmpeg-2.6.1-64bit-static/ffprobe
       - file: src=/opt/ffmpeg-2.6.1-64bit-static path=/opt/ffmpeg state=link
 
