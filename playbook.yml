@@ -73,7 +73,7 @@
   become: False
   tasks:
     - file:
-          path: "{{ansible_user_dir}}/bin"
+          path: "/home/vagrant/bin"
           state: directory
     - git:
           repo: https://github.com/kurron/docker-compose-tl.git
