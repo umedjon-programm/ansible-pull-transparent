@@ -7,7 +7,7 @@
     - group_by: key={{ ansible_distribution }}
 
 - name: Soft-link Ansible Files
-  hosts: all
+  hosts: CentOS,Fedora
   become: True
   tasks:
       - file:
@@ -22,7 +22,6 @@
             - ansible-playbook
             - ansible-pull
             - ansible-vault
-        when: (ansible_distribution == "Fedora") or (ansible_distribution == "CentOS")
 
 - name: Update Hosts File
   hosts: all
@@ -32,6 +31,7 @@
             dest: /etc/hosts
             line: "{{item}}"
         with_items:
+            - "127.0.0.1 mongo mongodb redis mysql rabbitmq postgresql"
             - "192.168.254.123 logfaces"
             - "192.168.100.124 logfaces-boston"
             - "192.168.100.127 mongo1"
@@ -81,7 +81,7 @@
           dest: "{{ansible_user_dir}}/GitHub/docker-compose-tl"
 
 - name: Docker Firewall Rules
-  hosts: CentOS
+  hosts: CentOS,Fedora
   become: True
   tasks:
     - yum:
@@ -95,7 +95,7 @@
   become: True
   tasks:
       - get_url:
-            url: http://192.168.254.81:81/artifactory/static/ffmpeg/ffmpeg-2.6.1-64bit-static.tar.xz
+            url: http://cd1:81/artifactory/static/ffmpeg/ffmpeg-2.6.1-64bit-static.tar.xz
             dest: "{{ansible_user_dir}}/ffmpeg.tar.xz"
             mode: 555
       - unarchive:
@@ -106,50 +106,60 @@
             creates: /opt/ffmpeg-2.6.1-64bit-static/ffprobe
       - file: src=/opt/ffmpeg-2.6.1-64bit-static path=/opt/ffmpeg state=link
 
-- name: Docker Registry (must be on VPN)
+- name: Docker Registry Credentials (unprivileged)
+  hosts: all
+  become: False
+  tasks:
+      - name: Place configuration file into the standard account
+        get_url:
+          url: http://cd1:81/artifactory/static/ease/docker-registry/.dockercfg
+          dest: "{{ansible_user_dir}}/.dockercfg"
+
+- name: Docker Registry Credentials (privileged)
+  hosts: all
+  become: True
+  tasks:
+      - name: Place configuration file into the root account
+        get_url:
+          url: http://cd1:81/artifactory/static/ease/docker-registry/.dockercfg
+          dest: "{{ansible_user_dir}}/.dockercfg"
+
+- name: Docker Registry
   hosts: Ubuntu
   become: True
   tasks:
       - name: Create CA certificates directory
-        file: path=/usr/local/share/ca-certificates/docker-registry state=directory
+        file:
+          path: /usr/local/share/ca-certificates/docker-registry
+          state: directory
       - name: Create SSL certificates directory
-        file: path=/etc/ssl/certs/ state=directory
+        file:
+          path: /etc/ssl/certs/
+          state: directory
       - name: Create SSL certificates directory
-        get_url: >
-                url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
-                dest=/usr/local/share/ca-certificates/docker-registry/registry.transparent.CA.crt
+        get_url:
+          url: http://cd1:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
+          dest: /usr/local/share/ca-certificates/docker-registry/registry.transparent.CA.crt
         register: certificate
       - name: Update certificates
         shell: update-ca-certificates
         when: certificate|changed
-      - name: Place configuration file into the root account
-        get_url: url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/.dockercfg dest=/root/.dockercfg
-      - name: Place configuration file into the vagrant account
-        get_url: url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/.dockercfg dest=/home/vagrant/.dockercfg
       - name: Restart Docker
         command: service docker restart
         when: certificate|changed
-      - name: Set permissions on the home directory
-        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
 
-- name: Docker Registry (must be on VPN)
-  hosts: CentOS
+- name: Docker Registry
+  hosts: CentOS,Fedora
   become: True
   tasks:
       - name: Create SSL certificates directory
-        get_url: >
-                url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
-                dest=/etc/pki/ca-trust/source/anchors/registry.transparent.CA.crt
+        get_url:
+          url: http://cd1:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
+          dest: /etc/pki/ca-trust/source/anchors/registry.transparent.CA.crt
         register: certificate
       - name: Update certificates
-        shell: /bin/update-ca-trust
+        shell: update-ca-trust
         when: certificate|changed
-      - name: Place configuration file into the root account
-        get_url: url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/.dockercfg dest=/root/.dockercfg
-      - name: Place configuration file into the vagrant account
-        get_url: url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/.dockercfg dest=/home/vagrant/.dockercfg
       - name: Restart Docker
         command: service docker restart
         when: certificate|changed
-      - name: Set permissions on the home directory
-        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
