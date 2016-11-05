@@ -1,37 +1,110 @@
 #!/usr/bin/env ansible-playbook
 
-- name: Gather prerequisites 
+- name: Gather prerequisites
   hosts: all
   gather_facts: True
   tasks:
     - group_by: key={{ ansible_distribution }}
 
-- name: Install Packages (Ubuntu)
-  hosts: Ubuntu
+- name: Soft-link Ansible Files
+  hosts: all
   become: True
   tasks:
-    - apt: name=git state=present
+      - file:
+            src: "/usr/bin/{{item}}"
+            dest: "/usr/local/bin/{{item}}"
+            state: link
+        with_items:
+            - ansible
+            - ansible-console
+            - ansible-doc
+            - ansible-galaxy
+            - ansible-playbook
+            - ansible-pull
+            - ansible-vault
+        when: (ansible_distribution == "Fedora") or (ansible_distribution == "CentOS")
 
-- name: Install Packages (CentOS)
-  hosts: CentOS
+- name: Update Hosts File
+  hosts: all
   become: True
   tasks:
-    - yum: name=iptables-services state=latest
+      - lineinfile:
+            dest: /etc/hosts
+            line: "{{item}}"
+        with_items:
+            - "192.168.254.123 logfaces"
+            - "192.168.100.124 logfaces-boston"
+            - "192.168.100.127 mongo1"
+            - "192.168.100.134 lds"
+            - "192.168.100.183 mongo2"
+            - "192.168.254.28 rabbit-test"
+            - "192.168.255.29 stagetwo"
+            - "192.168.254.57 mongo1test"
+            - "192.168.254.58 docker1test magni"
+            - "192.168.254.59 cd6"
+            - "192.168.254.73 mli-forever"
+            - "192.168.254.63 mongo2test"
+            - "192.168.254.81 cd1"
+            - "192.168.254.85 cd0"
+            - "192.168.254.114 cd5"
+            - "192.168.255.16 al-autotest-edge"
+            - "192.168.255.18 al-autotest-integration"
 
-- name: Docker Firewall Rules (CentOS)
-  hosts: CentOS
-  become: True
-  tasks:
-    - shell: /usr/sbin/iptables -I INPUT 1 -p tcp -s 172.17.0.0/24 -j ACCEPT
-    - shell: /sbin/service iptables save
-
-- name: Install Git Projects
+- name: Create Source Folders
   hosts: all
   become: False
   tasks:
-    - file: path=/home/vagrant/bin state=directory mode=0755
-    - git: repo=https://github.com/kurron/docker-compose-tl.git dest=/home/vagrant/bin/servers
-#   - file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+      - file:
+            path: "{{ansible_user_dir}}/Bitbucket/{{item}}"
+            state: directory
+        with_items:
+            - Asgard
+            - Gradle
+            - Mold-E
+            - Sush-E
+            - Operations
+            - Asgard-Light
+
+- name: Install GitHub Projects
+  hosts: all
+  become: False
+  tasks:
+    - file:
+          path: "{{ansible_user_dir}}/bin"
+          state: directory
+          mode: 0755
+    - git:
+          repo: https://github.com/kurron/docker-compose-tl.git
+          dest: "{{ansible_user_dir}}/bin/servers"
+    - git:
+          repo: https://github.com/kurron/docker-compose-tl.git
+          dest: "{{ansible_user_dir}}/GitHub/docker-compose-tl"
+
+- name: Docker Firewall Rules
+  hosts: CentOS
+  become: True
+  tasks:
+    - yum:
+          name: iptables-services
+          state: latest
+    - shell: /usr/sbin/iptables -I INPUT 1 -p tcp -s 172.17.0.0/24 -j ACCEPT
+    - shell: /sbin/service iptables save
+
+- name: Install FFMpeg
+  hosts: all
+  become: True
+  tasks:
+      - get_url:
+            url: http://192.168.254.81:81/artifactory/static/ffmpeg/ffmpeg-2.6.1-64bit-static.tar.xz
+            dest: "{{ansible_user_dir}}/ffmpeg.tar.xz"
+            mode: 555
+      - unarchive:
+            src: "{{ansible_user_dir}}/ffmpeg.tar.xz"
+            dest: /opt
+            copy: no
+            mode: 555
+            creates: /opt/ffmpeg-2.6.1-64bit-static/ffprobe
+      - file: src=/opt/ffmpeg-2.6.1-64bit-static path=/opt/ffmpeg state=link
 
 - name: Docker Registry (must be on VPN)
   hosts: Ubuntu
@@ -80,59 +153,3 @@
         when: certificate|changed
       - name: Set permissions on the home directory
         file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
-
-- name: Install FFMpeg
-  hosts: all
-  become: True
-  tasks:
-      - get_url: url=http://192.168.254.81:81/artifactory/static/ffmpeg/ffmpeg-2.6.1-64bit-static.tar.xz dest=/root/ffmpeg.tar.xz mode=555
-      - unarchive: src=/root/ffmpeg.tar.xz dest=/opt copy=no owner=root group=root mode=555 creates=/opt/ffmpeg-2.6.1-64bit-static/ffprobe
-      - file: src=/opt/ffmpeg-2.6.1-64bit-static path=/opt/ffmpeg state=link
-
-- name: Create Source Folders 
-  hosts: all
-  become: False
-  tasks:
-      - file: path=/home/vagrant/Bitbucket/Asgard state=directory
-      - file: path=/home/vagrant/Bitbucket/Gradle state=directory
-      - file: path=/home/vagrant/Bitbucket/Mold-E state=directory
-      - file: path=/home/vagrant/Bitbucket/Sush-E state=directory
-      - file: path=/home/vagrant/Bitbucket/Operations state=directory
-      - file: path=/home/vagrant/Bitbucket/Asgard-Light state=directory
-      - file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
-
-- name: Update Hosts File
-  hosts: all
-  become: True
-  tasks:
-      - lineinfile: dest=/etc/hosts line="192.168.100.134 lds"
-      - lineinfile: dest=/etc/hosts line="192.168.254.123 logfaces"
-      - lineinfile: dest=/etc/hosts line="192.168.100.124 logfaces-boston"
-      - lineinfile: dest=/etc/hosts line="192.168.254.73 mli-forever"
-      - lineinfile: dest=/etc/hosts line="192.168.254.57 mongo1test"
-      - lineinfile: dest=/etc/hosts line="192.168.254.63 mongo2test"
-      - lineinfile: dest=/etc/hosts line="192.168.254.59 mongo3test" state=absent
-      - lineinfile: dest=/etc/hosts line="192.168.100.127 mongo1"
-      - lineinfile: dest=/etc/hosts line="192.168.100.183 mongo2"
-      - lineinfile: dest=/etc/hosts line="192.168.255.29 stagetwo"
-      - lineinfile: dest=/etc/hosts line="192.168.254.85 cd0"
-      - lineinfile: dest=/etc/hosts line="192.168.254.81 cd1"
-      - lineinfile: dest=/etc/hosts line="192.168.254.114 cd5"
-      - lineinfile: dest=/etc/hosts line="192.168.254.59 cd6"
-      - lineinfile: dest=/etc/hosts line="192.168.254.28 rabbit-test"
-      - lineinfile: dest=/etc/hosts line="192.168.254.58 docker1test"
-      - lineinfile: dest=/etc/hosts line="192.168.254.58 magni"
-      - lineinfile: dest=/etc/hosts line="192.168.255.18 al-autotest-integration"
-      - lineinfile: dest=/etc/hosts line="192.168.255.16 al-autotest-edge"
-
-- name: Soft-link Ansible Files
-  hosts: CentOS
-  become: True
-  tasks:
-      - file: src=/usr/bin/ansible dest=/usr/local/bin/ansible state=link
-      - file: src=/usr/bin/ansible-console dest=/usr/local/bin/ansible-console state=link
-      - file: src=/usr/bin/ansible-doc dest=/usr/local/bin/ansible-doc state=link
-      - file: src=/usr/bin/ansible-galaxy dest=/usr/local/bin/ansible-galaxy state=link
-      - file: src=/usr/bin/ansible-playbook dest=/usr/local/bin/ansible-playbook state=link
-      - file: src=/usr/bin/ansible-pull dest=/usr/local/bin/ansible-pull state=link
-      - file: src=/usr/bin/ansible-vault dest=/usr/local/bin/ansible-vault state=link
