@@ -7,7 +7,7 @@
     - group_by: key={{ ansible_distribution }}
 
 - name: Soft-link Ansible Files
-  hosts: CentOS,Fedora
+  hosts: CentOS,Fedora,RedHat
   become: True
   tasks:
       - file:
@@ -82,7 +82,7 @@
           dest: "/home/vagrant/GitHub/docker-compose-tl"
 
 - name: Docker Firewall Rules
-  hosts: CentOS,Fedora
+  hosts: CentOS,Fedora,RedHat
   become: True
   tasks:
     - package:
@@ -148,7 +148,7 @@
         when: certificate|changed
 
 - name: Docker Registry
-  hosts: CentOS,Fedora
+  hosts: CentOS,Fedora,RedHat
   become: True
   tasks:
       - name: Create SSL certificates directory
