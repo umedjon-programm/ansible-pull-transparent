@@ -32,7 +32,6 @@
             line: "{{item}}"
         with_items:
             - "127.0.0.1 mongo mongodb redis mysql rabbitmq postgresql"
-            - "192.168.254.123 logfaces"
             - "192.168.100.124 logfaces-boston"
             - "192.168.100.127 mongo1"
             - "192.168.100.134 lds"
@@ -42,11 +41,12 @@
             - "192.168.254.57 mongo1test"
             - "192.168.254.58 docker1test magni"
             - "192.168.254.59 cd6"
-            - "192.168.254.73 mli-forever"
             - "192.168.254.63 mongo2test"
+            - "192.168.254.73 mli-forever"
             - "192.168.254.81 cd1"
             - "192.168.254.85 cd0"
             - "192.168.254.114 cd5"
+            - "192.168.254.123 logfaces"
             - "192.168.255.16 al-autotest-edge"
             - "192.168.255.18 al-autotest-integration"
 
@@ -115,7 +115,7 @@
           dest: "/home/vagrant/.dockercfg"
 
 - name: Docker Registry Credentials (privileged)
-  hosts: all
+  hosts: nobody
   become: True
   tasks:
       - name: Place configuration file into the root account
@@ -124,7 +124,8 @@
           dest: "{{ansible_user_dir}}/.dockercfg"
 
 - name: Docker Registry
-  hosts: Ubuntu
+  hosts: nobody
+# hosts: Ubuntu
   become: True
   tasks:
       - name: Create CA certificates directory
@@ -148,7 +149,8 @@
         when: certificate|changed
 
 - name: Docker Registry
-  hosts: CentOS,Fedora,RedHat
+# hosts: CentOS,Fedora,RedHat
+  hosts: nobody
   become: True
   tasks:
       - name: Create SSL certificates directory
