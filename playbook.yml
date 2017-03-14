@@ -73,7 +73,9 @@
   tasks:
     - template:
           dest: "/home/vagrant/.ssh/config"
+          group: vagrant
           mode: 0600
+          owner: vagrant
           src: "files/ssh.config"
 
 - name: Install GitHub Projects
