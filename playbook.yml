@@ -67,6 +67,15 @@
             - Operations
             - Asgard-Light
 
+- name: Install AWS Conveniences
+  hosts: all
+  become: False
+  tasks:
+    - template:
+          dest: "/home/vagrant/.ssh/config"
+          mode: 0600
+          src: "files/ssh.config"
+
 - name: Install GitHub Projects
   hosts: all
   become: False
