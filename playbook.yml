@@ -66,6 +66,7 @@
             - Sush-E
             - Operations
             - Asgard-Light
+            - Slurp-E
 
 - name: Install AWS Conveniences
   hosts: all
