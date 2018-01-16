@@ -116,57 +116,6 @@
           url: http://cd1:81/artifactory/static/ease/docker-registry/.dockercfg
           dest: "/home/vagrant/.dockercfg"
 
-- name: Docker Registry Credentials (privileged)
-  hosts: nobody
-  become: True
-  tasks:
-      - name: Place configuration file into the root account
-        get_url:
-          url: http://cd1:81/artifactory/static/ease/docker-registry/.dockercfg
-          dest: "{{ansible_user_dir}}/.dockercfg"
-
-- name: Docker Registry
-  hosts: nobody
-# hosts: Ubuntu
-  become: True
-  tasks:
-      - name: Create CA certificates directory
-        file:
-          path: /usr/local/share/ca-certificates/docker-registry
-          state: directory
-      - name: Create SSL certificates directory
-        file:
-          path: /etc/ssl/certs/
-          state: directory
-      - name: Create SSL certificates directory
-        get_url:
-          url: http://cd1:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
-          dest: /usr/local/share/ca-certificates/docker-registry/registry.transparent.CA.crt
-        register: certificate
-      - name: Update certificates
-        shell: update-ca-certificates
-        when: certificate|changed
-      - name: Restart Docker
-        command: service docker restart
-        when: certificate|changed
-
-- name: Docker Registry
-# hosts: CentOS,Fedora,RedHat
-  hosts: nobody
-  become: True
-  tasks:
-      - name: Create SSL certificates directory
-        get_url:
-          url: http://cd1:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
-          dest: /etc/pki/ca-trust/source/anchors/registry.transparent.CA.crt
-        register: certificate
-      - name: Update certificates
-        shell: update-ca-trust
-        when: certificate|changed
-      - name: Restart Docker
-        command: service docker restart
-        when: certificate|changed
-
 - name: Set Home Folder Permissions (must be last play)
   hosts: all
   become: True
