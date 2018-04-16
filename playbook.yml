@@ -50,6 +50,12 @@
             - "192.168.254.123 logfaces"
             - "192.168.255.16 al-autotest-edge"
             - "192.168.255.18 al-autotest-integration"
+            - "192.168.254.90 utilite1"
+            - "192.168.254.107 moldeutiltest"
+            - "192.168.254.28 rmq1test"
+            - "192.168.254.73 moldetest"
+            - "192.168.254.54 tlo_util"
+
 
 - name: Create Source Folders
   hosts: all
@@ -126,3 +132,4 @@
           group: vagrant
           recurse: true
           state: directory
+
