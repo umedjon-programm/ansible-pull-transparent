@@ -1,113 +1,135 @@
 #!/usr/bin/env ansible-playbook
 
-- name: Gather prerequisites 
+- name: Gather prerequisites
   hosts: all
   gather_facts: True
   tasks:
-    - name: create groups based on distribution
-      group_by: key={{ ansible_distribution }}
+    - group_by: key={{ ansible_distribution }}
 
-- name: Install Git Projects
-  hosts: Ubuntu
-  sudo: False
+- name: Soft-link Ansible Files
+  hosts: CentOS,Fedora,RedHat
+  become: True
   tasks:
-    - name: Make bin Directory
-      file: path=/home/vagrant/bin state=directory mode=0755
-    - name: Install Git
-      apt: name=git state=present
-    - name: Pull Down Docker Containers
-      git: repo=https://github.com/kurron/docker-compose-tl.git dest=/home/vagrant/bin/servers
-    - name: Set permissions on the home directory
-      file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
-
-- name: Docker Registry (must be on VPN)
-  hosts: Ubuntu
-  sudo: True
-  tasks:
-      - name: Create CA certificates directory
-        file: path=/usr/local/share/ca-certificates/docker-registry state=directory
-      - name: Create SSL certificates directory
-        file: path=/etc/ssl/certs/ state=directory
-      - name: Create SSL certificates directory
-        get_url: >
-                url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/certifcate/registry.transparent.CA.crt
-                dest=/usr/local/share/ca-certificates/docker-registry/registry.transparent.CA.crt
-        register: certificate
-      - name: Add registry to hosts file
-        lineinfile: dest=/etc/hosts line="192.168.254.90 registry.transparent.com"
-      - name: Add cd1 to hosts file
-        lineinfile: dest=/etc/hosts line="192.168.254.81 cd1"
-      - name: Update certificates
-        shell: update-ca-certificates
-        when: certificate|changed
-      - name: Place configuration file into the root account
-        get_url: url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/.dockercfg dest=/root/.dockercfg
-      - name: Place configuration file into the vagrant account
-        get_url: url=http://192.168.254.81:81/artifactory/static/ease/docker-registry/.dockercfg dest=/home/vagrant/.dockercfg
-      - name: Restart Docker
-        command: service docker restart
-        when: certificate|changed
-      - name: Set permissions on the home directory
-        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
-
-- name: Create Source Folders 
-  hosts: Ubuntu
-  sudo: False
-  tasks:
-      - name: Create Asgard project directory
-        file: path=/home/vagrant/Stash/Asgard state=directory
-      - name: Create Gradle project directory
-        file: path=/home/vagrant/Stash/Gradle state=directory
-      - name: Create Mold-E project directory
-        file: path=/home/vagrant/Stash/Mold-E state=directory
-      - name: Create Sush-E project directory
-        file: path=/home/vagrant/Stash/Sush-E state=directory
-      - name: Create Operations project directory
-        file: path=/home/vagrant/Stash/Operations state=directory
-      - name: Set permissions on the home directory
-        file: path=/home/vagrant owner=vagrant group=vagrant recurse=true state=directory
+      - file:
+            src: "/usr/bin/{{item}}"
+            dest: "/usr/local/bin/{{item}}"
+            state: link
+        with_items:
+            - ansible
+            - ansible-console
+            - ansible-doc
+            - ansible-galaxy
+            - ansible-playbook
+            - ansible-pull
+            - ansible-vault
 
 - name: Update Hosts File
-  hosts: Ubuntu
-  sudo: True
+  hosts: all
+  become: True
   tasks:
-      - name: Add lds to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.100.134 lds"
-      - name: Add logfaces to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.123 logfaces"
-      - name: Add logfaces-boston to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.100.124 logfaces-boston"
-      - name: Add mli-forever to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.66 mli-forever"
-      - name: Add mongo2test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.63 mongo2test"
-      - name: Add mongo3test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.59 mongo3test" state=absent
-      - name: Add mongo2 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.100.183 mongo2"
-      - name: Add stagetwo to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.255.29 stagetwo"
-      - name: Add cd0 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.85 cd0"
-      - name: Add cd1 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.81 cd1"
-      - name: Add cd5 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.114 cd5"
-      - name: Add cd6 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.59 cd6"
-      - name: Add rabbit-test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.28 rabbit-test"
-      - name: Add docker1test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.58 docker1test"
-      - name: Add al-autotest-integration to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.255.18 al-autotest-integration"
-      - name: Add utilite1 ( media ) to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.90 utilite1"
-      - name: Add moldeutiltest to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.107 moldeutiltest"
-      - name: Add rmq1test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.28 rmq1test"
-      - name: Add moldetest to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.73 moldetest"
-      - name: Add moldetest to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.54 tlo_util"
+      - lineinfile:
+            dest: /etc/hosts
+            line: "{{item}}"
+        with_items:
+            - "127.0.0.1 mongo mongodb redis mysql rabbitmq postgresql"
+            - "192.168.100.124 logfaces-boston"
+            - "192.168.100.127 mongo1"
+            - "192.168.100.134 lds"
+            - "192.168.100.183 mongo2"
+            - "192.168.254.28 rabbit-test"
+            - "192.168.255.29 stagetwo"
+            - "192.168.254.48 cd7"
+            - "192.168.254.57 mongo1test"
+            - "192.168.254.58 docker1test magni"
+            - "192.168.254.59 cd6"
+            - "192.168.254.63 mongo2test"
+            - "192.168.254.73 mli-forever"
+            - "192.168.254.81 cd1"
+            - "192.168.254.85 cd0"
+            - "192.168.254.114 cd5"
+            - "192.168.254.123 logfaces"
+            - "192.168.255.16 al-autotest-edge"
+            - "192.168.255.18 al-autotest-integration"
+            - "192.168.254.90 utilite1"
+            - "192.168.254.107 moldeutiltest"
+            - "192.168.254.28 rmq1test"
+            - "192.168.254.73 moldetest"
+            - "192.168.254.54 tlo_util"
+
+
+- name: Create Source Folders
+  hosts: all
+  become: False
+  tasks:
+      - file:
+            path: "/home/vagrant/Bitbucket/{{item}}"
+            state: directory
+            owner: vagrant
+            group: vagrant
+        with_items:
+            - Asgard
+            - Gradle
+            - Mold-E
+            - Sush-E
+            - Operations
+            - Asgard-Light
+            - Slurp-E
+
+- name: Install GitHub Projects
+  hosts: all
+  become: False
+  tasks:
+    - file:
+          path: "/home/vagrant/bin"
+          state: directory
+    - git:
+          repo: https://github.com/kurron/docker-compose-tl.git
+          dest: "/home/vagrant/bin/servers"
+    - git:
+          repo: https://github.com/kurron/docker-compose-tl.git
+          dest: "/home/vagrant/GitHub/docker-compose-tl"
+
+- name: Docker Firewall Rules
+  hosts: CentOS,Fedora,RedHat
+  become: True
+  tasks:
+    - package:
+          name: iptables-services
+          state: latest
+    - shell: /usr/sbin/iptables -I INPUT 1 -p tcp -s 172.17.0.0/24 -j ACCEPT
+    - shell: /sbin/service iptables save
+
+- name: Install FFMpeg
+  hosts: all
+  become: True
+  tasks:
+      - get_url:
+            url: http://cd1:81/artifactory/static/ffmpeg/ffmpeg-2.6.1-64bit-static.tar.xz
+            dest: "{{ansible_user_dir}}/ffmpeg.tar.xz"
+      - unarchive:
+            src: "{{ansible_user_dir}}/ffmpeg.tar.xz"
+            dest: /opt
+            copy: no
+            creates: /opt/ffmpeg-2.6.1-64bit-static/ffprobe
+      - file: src=/opt/ffmpeg-2.6.1-64bit-static path=/opt/ffmpeg state=link
+
+- name: Docker Registry Credentials (unprivileged
+  hosts: all
+  become: False
+  tasks:
+      - name: Place configuration file into the standard account
+        get_url:
+          url: http://cd1:81/artifactory/static/ease/docker-registry/.dockercfg
+          dest: "/home/vagrant/.dockercfg"
+
+- name: Set Home Folder Permissions (must be last play)
+  hosts: all
+  become: True
+  tasks:
+    - file:
+          path: /home/vagrant
+          owner: vagrant
+          group: vagrant
+          recurse: true
+          state: directory
+
