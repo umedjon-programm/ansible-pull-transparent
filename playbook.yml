@@ -79,14 +79,10 @@
         lineinfile: dest=/etc/hosts line="192.168.100.124 logfaces-boston"
       - name: Add mli-forever to hostfile
         lineinfile: dest=/etc/hosts line="192.168.254.66 mli-forever"
-      - name: Add mongo1test to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.254.57 mongo1test"
       - name: Add mongo2test to hostfile
         lineinfile: dest=/etc/hosts line="192.168.254.63 mongo2test"
       - name: Add mongo3test to hostfile
         lineinfile: dest=/etc/hosts line="192.168.254.59 mongo3test" state=absent
-      - name: Add mongo1 to hostfile
-        lineinfile: dest=/etc/hosts line="192.168.100.127 mongo1"
       - name: Add mongo2 to hostfile
         lineinfile: dest=/etc/hosts line="192.168.100.183 mongo2"
       - name: Add stagetwo to hostfile
@@ -103,5 +99,15 @@
         lineinfile: dest=/etc/hosts line="192.168.254.28 rabbit-test"
       - name: Add docker1test to hostfile
         lineinfile: dest=/etc/hosts line="192.168.254.58 docker1test"
-      - name: Add docker1test to hostfile
+      - name: Add al-autotest-integration to hostfile
         lineinfile: dest=/etc/hosts line="192.168.255.18 al-autotest-integration"
+      - name: Add utilite1 ( media ) to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.90 utilite1"
+      - name: Add moldeutiltest to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.107 moldeutiltest"
+      - name: Add rmq1test to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.28 rmq1test"
+      - name: Add moldetest to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.73 moldetest"
+      - name: Add moldetest to hostfile
+        lineinfile: dest=/etc/hosts line="192.168.254.54 tlo_util"
