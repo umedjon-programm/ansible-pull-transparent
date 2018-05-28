@@ -1,7 +1,7 @@
 #!/usr/bin/env ansible-playbook
 
 - name: Gather prerequisites
-  hosts: all
+  hosts: localhost
   gather_facts: True
   tasks:
     - group_by: key={{ ansible_distribution }}
@@ -14,7 +14,7 @@
             src: "/usr/bin/{{item}}"
             dest: "/usr/local/bin/{{item}}"
             state: link
-        with_items:
+        loop:
             - ansible
             - ansible-console
             - ansible-doc
@@ -24,7 +24,7 @@
             - ansible-vault
 
 - name: Update Hosts File
-  hosts: all
+  hosts: localhost
   become: True
   tasks:
       - lineinfile:
@@ -58,7 +58,7 @@
 
 
 - name: Create Source Folders
-  hosts: all
+  hosts: localhost
   become: False
   tasks:
       - file:
@@ -66,7 +66,7 @@
             state: directory
             owner: vagrant
             group: vagrant
-        with_items:
+        loop:
             - Asgard
             - Gradle
             - Mold-E
@@ -76,7 +76,7 @@
             - Slurp-E
 
 - name: Install GitHub Projects
-  hosts: all
+  hosts: localhost
   become: False
   tasks:
     - file:
@@ -100,7 +100,7 @@
     - shell: /sbin/service iptables save
 
 - name: Install FFMpeg
-  hosts: all
+  hosts: none
   become: True
   tasks:
       - get_url:
@@ -113,23 +113,12 @@
             creates: /opt/ffmpeg-2.6.1-64bit-static/ffprobe
       - file: src=/opt/ffmpeg-2.6.1-64bit-static path=/opt/ffmpeg state=link
 
-- name: Docker Registry Credentials (unprivileged
-  hosts: all
+- name: Docker Registry Credentials (unprivileged)
+  hosts: none
   become: False
   tasks:
       - name: Place configuration file into the standard account
         get_url:
           url: http://cd1:81/artifactory/static/ease/docker-registry/.dockercfg
           dest: "/home/vagrant/.dockercfg"
-
-- name: Set Home Folder Permissions (must be last play)
-  hosts: all
-  become: True
-  tasks:
-    - file:
-          path: /home/vagrant
-          owner: vagrant
-          group: vagrant
-          recurse: true
-          state: directory
 
