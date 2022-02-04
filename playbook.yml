@@ -62,10 +62,10 @@
   become: False
   tasks:
       - file:
-            path: "/home/vagrant/Bitbucket/{{item}}"
+            path: "/home/umedjon/Bitbucket/{{item}}"
             state: directory
-            owner: vagrant
-            group: vagrant
+            owner: umedjon
+            group: umedjon
         loop:
             - Asgard
             - Gradle
@@ -80,14 +80,14 @@
   become: False
   tasks:
     - file:
-          path: "/home/vagrant/bin"
+          path: "/home/umedjon/bin"
           state: directory
     - git:
           repo: https://github.com/kurron/docker-compose-tl.git
-          dest: "/home/vagrant/bin/servers"
+          dest: "/home/umedjon/bin/servers"
     - git:
           repo: https://github.com/kurron/docker-compose-tl.git
-          dest: "/home/vagrant/GitHub/docker-compose-tl"
+          dest: "/home/umedjon/GitHub/docker-compose-tl"
 
 - name: Docker Firewall Rules
   hosts: CentOS,Fedora,RedHat
@@ -120,5 +120,5 @@
       - name: Place configuration file into the standard account
         get_url:
           url: http://cd1:81/artifactory/static/ease/docker-registry/.dockercfg
-          dest: "/home/vagrant/.dockercfg"
+          dest: "/home/umedjon/.dockercfg"
 
